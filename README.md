@@ -14,12 +14,12 @@ Two parts:
   read-only IMAP MCP server for the Claude desktop app, with the password
   helper and the four fixes it needs to survive a real mailbox. **Shipped.**
   Useful on its own for anything you want Claude to *read* in your mail.
-- **`SKILL.md`** — the sweep itself: a Claude skill that reads recent mail
-  through that server, decides by *reading* (not regex) what is a receipt,
-  what is a renewal or statement notice, and what is marketing, and drops each
-  keep into a local inbox folder with a one-line manifest entry. **In
-  progress** — the contract is settled (below); the skill and its fixtures
-  are next.
+- **[`skill/imap-receipt-sweep/`](skill/imap-receipt-sweep/)** — the sweep
+  itself: a Claude skill that reads recent mail through that server, decides
+  by *reading* (not regex) what is a receipt, what is a renewal or statement
+  notice, and what is marketing, and drops each keep into a local inbox folder
+  with a one-line manifest entry. **Shipped**, with synthetic fixtures and a
+  checker so you can see it judge before pointing it at your mail.
 
 ## The promise
 
@@ -44,11 +44,15 @@ These hold for the kit today and are the contract the skill is written to.
    (Python 3.11+, ~15 minutes, iCloud notes in [`providers/icloud.md`](imap-mcp-kit/providers/icloud.md)).
 2. Ask Claude something that proves it works: *"Search my personal mailbox
    INBOX for receipts from the last 30 days."* Always name the folder.
-3. Optional: measure how well a rules file finds your receipts with
+3. Install the skill. Claude Code: `cp -r skill/imap-receipt-sweep ~/.claude/skills/`.
+   Claude desktop app: zip that folder and add it as a custom skill in
+   Settings. Then: *"Sweep my personal mailbox for receipts since the 1st into
+   `~/receipts/inbox`."*
+4. Optional: measure how well a rules file finds your receipts with
    [`eval/`](eval/) — flag some receipts in your mail client (one Apple Mail
    colour, say), run the audit, read the misses.
 
-## The skill contract (settled; implementation next)
+## The skill contract
 
 - **Trigger:** an explicit ask ("sweep my mail for receipts"). Never scheduled.
 - **Inputs:** an inbox folder path; optionally a rules file
@@ -73,6 +77,15 @@ substring rules do badly and untestably. The easy parts (de-dupe, don't
 re-save, never upload) are a few lines the skill states and the manifest
 enforces.
 
+How it has been tested: against the nine synthetic fixtures in
+[`eval/fixtures/`](eval/fixtures/) (all nine judged correctly, manifest valid
+— `eval/check_run.py` scores a run), and one live read-only pass over a real
+iCloud INBOX (ten days, ten saves, folder always named, cap honoured, no
+shipping notices, attachment saved as a PDF). The same model *without* the
+skill made the same keep/skip decisions but wrote a manifest a consumer
+couldn't use — amounts as objects, dates as timestamps, stray `.eml` copies —
+which is what the skill is for.
+
 ## The manifest
 
 One JSON object per line in `<inbox>/.sweep-manifest.jsonl`, schema in
@@ -96,10 +109,15 @@ README.md                  this file
 LICENSE                    MIT
 rules.example.csv          field,contains,mode — optional narrowing rules, generic entries only
 manifest.schema.json       the per-file record the skill writes
+skill/imap-receipt-sweep/
+  SKILL.md                 the skill: contract, search, classification guide, saving, manifest, fixture mode
+  scripts/eml_to_json.py   fixture mode — .eml files in the shape mail_fetch returns
+  scripts/manifest_check.py  validates a manifest; prints the last date / the ids
 eval/
   README.md                the flagged-mail recall method
   recall_audit.py          stdlib; headers-only; writes a scorecard CSV
-  fixtures/                (coming) synthetic .eml files — never real mail
+  check_run.py             scores a fixture-mode sweep against expected.jsonl
+  fixtures/                nine synthetic .eml files across two "accounts", the generator, and the answer key
 imap-mcp-kit/
   INSTALL.md               the vetted read-only server: install, patch, configure, register
   setpw.py                 app-password prompt-verify-write helper

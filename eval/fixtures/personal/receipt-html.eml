@@ -1,0 +1,35 @@
+From: Northwind Stationery <receipts@northwind.example>
+To: someone@example.com
+Subject: Your Northwind Stationery receipt =?utf-8?b?4oCU?= order #NW-2231
+Date: Sat, 05 Sep 2026 09:20:00 -0000
+Message-ID: <nw-2231-receipt@northwind.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============3485002776706795428=="
+
+--===============3485002776706795428==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============3485002776706795428==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<h1>Thanks for your order</h1>
+<p>Order <b>#NW-2231</b> placed 5 September 2026.</p>
+<table>
+<tr><td>Fountain pen ink, 50 ml (2)</td><td>$24.00</td></tr>
+<tr><td>Dot-grid notebook A5</td><td>$14.50</td></tr>
+<tr><td>Shipping</td><td>$0.00</td></tr>
+<tr><td>Tax</td><td>$3.67</td></tr>
+<tr><td><b>Total charged to card ending 4242</b></td><td><b>$42.17</b></td></=
+tr>
+</table>
+<p>Questions? Reply to this email.</p>
+</body></html>
+
+--===============3485002776706795428==--

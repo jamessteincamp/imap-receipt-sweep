@@ -47,12 +47,20 @@
     "renews_on": {
       "type": ["string", "null"],
       "format": "date",
-      "description": "For a renewal-notice: the date the message says the charge will occur."
+      "description": "The date the message says the next charge will occur. Set on a renewal-notice, and on a receipt that also announces its next renewal (one line carries both facts)."
     },
     "swept_at": {
       "type": "string",
       "format": "date-time",
       "description": "When this line was written (local time, ISO 8601)."
+    },
+    "source_id": {
+      "type": "string",
+      "description": "The mail server's own id for the message (e.g. mail://<folder-token>/<uid>). Stable within one account only — a cheap pre-fetch de-dupe key; message_id remains the real one."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free text the sweep wants a human to see, e.g. 'attachment 4.2 MB skipped, HTML body saved instead'."
     }
   }
 }

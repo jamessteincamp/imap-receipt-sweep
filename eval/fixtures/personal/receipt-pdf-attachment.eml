@@ -1,0 +1,35 @@
+From: Contoso Cloud Billing <billing@contoso-cloud.example>
+To: someone@example.com
+Subject: Invoice #1001 for September
+Date: Sat, 05 Sep 2026 10:20:00 -0000
+Message-ID: <inv-1001@contoso-cloud.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4198497126112871827=="
+
+--===============4198497126112871827==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Your invoice for September is attached.
+
+Amount charged: $19.00
+Payment method: card on file
+
+Contoso Cloud
+
+--===============4198497126112871827==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="invoice-1001.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBv
+Ymo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlw
+ZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgMzAwIDE0NF0vQ29udGVudHMgNCAwIFIv
+UmVzb3VyY2VzPDwvRm9udDw8L0YxIDUgMCBSPj4+Pj4+ZW5kb2JqCjQgMCBvYmo8PC9MZW5ndGgg
+ODQ+PnN0cmVhbQpCVCAvRjEgMTggVGYgMjQgMTAwIFRkIChDb250b3NvIENsb3VkIC0gSW52b2lj
+ZSAxMDAxKSBUaiAwIC0zMiBUZCAoVG90YWwgZHVlOiAkMTkuMDApIFRqIEVUCmVuZHN0cmVhbQpl
+bmRvYmoKNSAwIG9iajw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGlj
+YT4+ZW5kb2JqCnRyYWlsZXI8PC9Sb290IDEgMCBSPj4KJSVFT0YK
+
+--===============4198497126112871827==--

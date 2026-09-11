@@ -11,6 +11,7 @@ recall-audit-*.csv
 # Sweep output
 inbox/
 .sweep-manifest.jsonl
+*.b64
 
 # Python / OS
 .venv/

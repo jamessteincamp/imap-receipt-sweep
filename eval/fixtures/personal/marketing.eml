@@ -1,0 +1,31 @@
+From: Northwind Stationery <news@northwind.example>
+To: someone@example.com
+Subject: Order now: 30% off everything this weekend
+Date: Sat, 05 Sep 2026 13:20:00 -0000
+Message-ID: <promo-fall-2026@northwind.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============3856951429349367752=="
+
+--===============3856951429349367752==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============3856951429349367752==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<h1>Fall sale =E2=80=94 30% off</h1>
+<p>Dot-grid notebooks from <b>$9.99</b>. Ink from <b>$8.40</b>. Free shipping=
+ over <b>$50.00</b>.</p>
+<p><a href=3D"https://northwind.example/sale">Shop the sale</a> =E2=80=94 end=
+s Sunday.</p>
+<p><small>You are receiving this because you bought from us. <a href=3D"#">Un=
+subscribe</a></small></p>
+</body></html>
+
+--===============3856951429349367752==--

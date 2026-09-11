@@ -1,0 +1,9 @@
+{"file": "personal/receipt-html.eml", "kind": "receipt", "amounts_include": ["42.17"], "vendor_contains": "Northwind", "renews_on": null, "saved_ext": ".html", "note": "plain receipt; the HTML body is what gets saved (no attachment)"}
+{"file": "personal/receipt-pdf-attachment.eml", "kind": "receipt", "amounts_include": ["19.00"], "vendor_contains": "Contoso", "renews_on": null, "saved_ext": ".pdf", "note": "the PDF attachment is saved, not the body"}
+{"file": "personal/renewal-notice.eml", "kind": "renewal-notice", "amounts_include": ["9.99"], "vendor_contains": "Fabrikam", "renews_on": "2026-10-01", "saved_ext": ".html", "note": "forward-looking: nothing charged yet"}
+{"file": "personal/statement-available.eml", "kind": "statement-available", "amounts_include": [], "vendor_contains": "Woodgrove", "renews_on": null, "saved_ext": ".txt", "note": "no amount in the mail by design"}
+{"file": "personal/marketing.eml", "kind": "skip", "note": "has dollar amounts but nothing was bought — amounts alone do not make a receipt"}
+{"file": "personal/receipt-and-renewal.eml", "kind": "receipt", "amounts_include": ["9.99"], "vendor_contains": "Fabrikam", "renews_on": "2026-10-05", "saved_ext": ".html", "note": "BOTH a receipt and a renewal notice: one line, kind=receipt, renews_on filled — the case regex-based sweeps drop"}
+{"file": "personal/shipping-notice.eml", "kind": "skip", "note": "shipping notice for an order whose receipt is swept separately; no amount"}
+{"file": "work/receipt-html-duplicate.eml", "kind": "duplicate", "note": "same Message-ID as personal/receipt-html.eml — must be skipped as a duplicate, no second manifest line, no second file"}
+{"file": "work/refund.eml", "kind": "receipt", "amounts_include": ["-19.00"], "vendor_contains": "Contoso", "renews_on": null, "saved_ext": ".txt", "note": "money moved back: still a receipt, amount negative"}

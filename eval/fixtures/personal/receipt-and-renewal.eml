@@ -1,0 +1,29 @@
+From: Fabrikam Plus <no-reply@fabrikam.example>
+To: someone@example.com
+Subject: Receipt for your Fabrikam Plus renewal
+Date: Sat, 05 Sep 2026 14:20:00 -0000
+Message-ID: <renew-receipt-2026-09@fabrikam.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============0715529685110182788=="
+
+--===============0715529685110182788==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============0715529685110182788==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<h2>Payment received</h2>
+<p>We charged <b>$9.99</b> to your card on file on 5 September 2026 for <b>Fa=
+brikam Plus (monthly)</b>.</p>
+<p>Receipt number: FP-88410</p>
+<p>Your next renewal is on <b>5 October 2026</b> for the same amount.</p>
+</body></html>
+
+--===============0715529685110182788==--

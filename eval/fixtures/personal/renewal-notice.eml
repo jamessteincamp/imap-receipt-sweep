@@ -1,0 +1,31 @@
+From: Fabrikam Plus <no-reply@fabrikam.example>
+To: someone@example.com
+Subject: Your Fabrikam Plus plan renews on October 1
+Date: Sat, 05 Sep 2026 11:20:00 -0000
+Message-ID: <renew-2026-10@fabrikam.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============0365662085433062437=="
+
+--===============0365662085433062437==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============0365662085433062437==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<p>Hi there,</p>
+<p>This is a reminder that your <b>Fabrikam Plus (monthly)</b> plan will auto=
+matically renew on
+<b>1 October 2026</b>. Your card on file will be charged <b>$9.99</b> on that=
+ date.</p>
+<p>No action is needed. To change or cancel your plan, visit your account set=
+tings before the renewal date.</p>
+</body></html>
+
+--===============0365662085433062437==--

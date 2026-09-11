@@ -1,0 +1,24 @@
+From: Northwind Stationery <receipts@northwind.example>
+To: work@example.com
+Subject: Your Northwind Stationery receipt =?utf-8?b?4oCU?= order #NW-2231
+Date: Sat, 05 Sep 2026 09:20:00 -0000
+Message-ID: <nw-2231-receipt@northwind.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============2052775473552839454=="
+
+--===============2052775473552839454==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============2052775473552839454==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body><p>Order <b>#NW-2231</b>. <b>Total $42.17</b> charged to card end=
+ing 4242.</p></body></html>
+
+--===============2052775473552839454==--

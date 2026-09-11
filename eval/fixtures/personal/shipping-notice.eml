@@ -1,0 +1,26 @@
+From: Northwind Stationery <no-reply@northwind.example>
+To: someone@example.com
+Subject: Your Northwind order #NW-2231 has shipped
+Date: Sat, 05 Sep 2026 15:20:00 -0000
+Message-ID: <nw-2231-shipped@northwind.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============5486505882284548642=="
+
+--===============5486505882284548642==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This message is best viewed as HTML.
+
+--===============5486505882284548642==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+
+<html><body>
+<p>Good news — order <b>#NW-2231</b> is on its way.</p>
+<p>Tracking: 1Z-EXAMPLE-000. Expected delivery: 9 September.</p>
+</body></html>
+
+--===============5486505882284548642==--

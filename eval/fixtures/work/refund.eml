@@ -1,0 +1,13 @@
+From: Contoso Cloud Billing <billing@contoso-cloud.example>
+To: work@example.com
+Subject: Refund issued for invoice #0998
+Date: Sat, 05 Sep 2026 16:20:00 -0000
+Message-ID: <refund-0998@contoso-cloud.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+
+We have refunded $19.00 to your original payment method for invoice #0998.
+Refunds take 5–10 business days to appear.
+
+Contoso Cloud
