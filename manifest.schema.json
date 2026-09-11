@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jamessteincamp/imap-receipt-sweep/blob/main/manifest.schema.json",
+  "title": "imap-receipt-sweep manifest line",
+  "description": "One JSON object per line in <inbox>/.sweep-manifest.jsonl — one per file the sweep saved. Consumers key on message_id for de-dupe and on kind for routing.",
+  "type": "object",
+  "required": ["message_id", "account", "date", "from", "subject", "kind", "file", "swept_at"],
+  "additionalProperties": false,
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "description": "The RFC 5322 Message-ID, angle brackets included. The de-dupe key across accounts and runs.",
+      "pattern": "^<.+>$"
+    },
+    "account": {
+      "type": "string",
+      "description": "Which configured mailbox it came from — the config file's stem, e.g. 'personal'."
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The message's Date header as YYYY-MM-DD."
+    },
+    "from": {
+      "type": "string",
+      "description": "Sender address (the addr-spec, not the display name)."
+    },
+    "subject": { "type": "string" },
+    "kind": {
+      "type": "string",
+      "enum": ["receipt", "renewal-notice", "statement-available"],
+      "description": "The classification. 'skip' is never written — skipped mail has no manifest line."
+    },
+    "file": {
+      "type": "string",
+      "description": "File name relative to the inbox folder: YYYY-MM-DD_<sender-slug>_<subject-slug>.<ext>."
+    },
+    "amounts": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^-?[0-9]+\\.[0-9]{2}$" },
+      "description": "Money amounts seen in the message, as decimal strings, largest first. May be empty."
+    },
+    "vendor": {
+      "type": ["string", "null"],
+      "description": "Best-effort vendor name as the message presents it."
+    },
+    "renews_on": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "For a renewal-notice: the date the message says the charge will occur."
+    },
+    "swept_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this line was written (local time, ISO 8601)."
+    }
+  }
+}

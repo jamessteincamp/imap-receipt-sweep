@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mail-personal": {
+      "command": "/Users/YOU/imap-mcp/imap-readonly-mcp-main/.venv/bin/imap-readonly-mcp",
+      "args": ["--config", "/Users/YOU/imap-mcp/personal.yaml"]
+    },
+    "mail-work": {
+      "command": "/Users/YOU/imap-mcp/imap-readonly-mcp-main/.venv/bin/imap-readonly-mcp",
+      "args": ["--config", "/Users/YOU/imap-mcp/work.yaml"]
+    }
+  }
+}

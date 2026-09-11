@@ -1,0 +1,19 @@
+# Credentials and caches — never commit a real account config
+*.yaml
+*.yml
+!imap-mcp-kit/config.example.yaml
+*.sqlite
+*.sqlite-journal
+
+# Eval output: contains your senders and subjects
+recall-audit-*.csv
+
+# Sweep output
+inbox/
+.sweep-manifest.jsonl
+
+# Python / OS
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

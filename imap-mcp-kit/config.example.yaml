@@ -1,0 +1,13 @@
+# One file per mailbox. Copy to ~/imap-mcp/<account>.yaml, then either fill in
+# the password by hand or run:  python3 setpw.py ~/imap-mcp/<account>.yaml --provider icloud
+# Afterwards:  chmod 600 ~/imap-mcp/<account>.yaml && chmod 700 ~/imap-mcp
+account:
+  protocol: imap
+  description: "iCloud - personal"       # shown in tool output; any label
+  host: imap.mail.me.com                 # provider IMAP host — see providers/
+  port: 993                              # SSL/TLS is on by default
+  username: you@example.com              # for iCloud, the Apple ID address
+  password: "APP-SPECIFIC-PASSWORD"      # never the real account password
+# Must be a real, writable file, one PER ACCOUNT (never shared). /dev/null crashes
+# this version. Fetched mail is cached here — keep it inside the chmod 700 folder.
+cache_path: /Users/YOU/imap-mcp/personal-cache.sqlite

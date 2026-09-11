@@ -1,0 +1,23 @@
+field,contains,mode
+subject,receipt,include
+subject,invoice,include
+subject,your order,include
+subject,order confirmation,include
+subject,payment confirmation,include
+subject,payment received,include
+subject,thanks for your purchase,include
+subject,thank you for your order,include
+subject,renewal,include
+subject,statement is available,include
+subject,statement is ready,include
+from,billing@,include
+from,receipts@,include
+from,orders@,include
+subject,newsletter,exclude
+subject,% off,exclude
+subject,sale ends,exclude
+subject,last chance,exclude
+subject,don't miss,exclude
+from,marketing@,exclude
+from,newsletter@,exclude
+from,promo@,exclude
