@@ -203,6 +203,57 @@ class Save(InboxCase):
         self.assertEqual(cm.exception.code, "io")
 
 
+@unittest.skipUnless(manifest.fcntl, "advisory locks are POSIX-only")
+class HostRewrite(InboxCase):
+    """A host app that re-points a moved file's line rewrites the manifest by renaming a
+    temp file over it, holding a flock on the file it replaces. A save that waited on
+    that lock must end up holding the lock on the file that is there now."""
+
+    def test_save_waiting_on_a_replaced_manifest_locks_the_new_one(self):
+        import fcntl
+        import threading
+        manifest.save(self.inbox, meta(), self.html(), run=RUN)
+        path = os.path.join(self.inbox, manifest.MANIFEST_NAME)
+        host = open(path, "a+")
+        fcntl.flock(host, fcntl.LOCK_EX)              # the host starts its rewrite
+
+        inside, release = threading.Event(), threading.Event()
+        real_append = manifest._append
+
+        def slow_append(inbox, line):
+            inside.set()
+            release.wait(5)
+            real_append(inbox, line)
+
+        manifest._append = slow_append
+        self.addCleanup(setattr, manifest, "_append", real_append)
+        result = {}
+        t = threading.Thread(target=lambda: result.update(
+            manifest.save(self.inbox, meta(message_id="<b2@northwind.example>"), self.html(), run=RUN)))
+        t.start()
+        self.assertFalse(inside.wait(0.3), "save ran while the host held the lock")
+
+        tmp = path + ".host-tmp"                       # the host swaps a new copy in, then lets go
+        with open(path) as fh, open(tmp, "w") as out:
+            out.write(fh.read())
+        os.replace(tmp, path)
+        fcntl.flock(host, fcntl.LOCK_UN)
+        host.close()
+        self.assertTrue(inside.wait(5), "save never got the lock")
+
+        second = open(path, "a+")                      # a second host write must wait for the save
+        try:
+            with self.assertRaises(BlockingIOError):
+                fcntl.flock(second, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        finally:
+            second.close()
+            release.set()
+            t.join(5)
+        self.assertTrue(result.get("ok"))
+        self.assertEqual([r["message_id"] for r in self.lines()],
+                         ["<a1@northwind.example>", "<b2@northwind.example>"])
+
+
 class Status(InboxCase):
     TODAY = dt.date(2026, 11, 14)
 
