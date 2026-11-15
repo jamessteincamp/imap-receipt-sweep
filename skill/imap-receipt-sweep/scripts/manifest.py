@@ -23,6 +23,11 @@ save    Files one keep. The meta JSON (stdin, or --meta PATH) carries the
         Exit 0 saved · 2 invalid · 3 duplicate · 4 cap reached · 5 I/O error.
         On 2–5 nothing was written. Every outcome is one JSON object on stdout.
 
+A host app that rewrites the manifest (to re-point a line whose file it moved)
+should hold an exclusive flock on the manifest file while it reads and
+rewrites, and swap the new copy in with a rename. save takes the same lock and
+re-checks it after a swap, so neither side loses the other's change.
+
 Stdlib only. The schema (../manifest.schema.json) is the single source of the
 line format; this module reads it at runtime.
 """
@@ -466,14 +471,37 @@ def _longest_string(node):
 
 @contextmanager
 def _lock(inbox):
-    with open(os.path.join(inbox, MANIFEST_NAME), "a+", encoding="utf-8") as fh:
-        if fcntl:
-            fcntl.flock(fh, fcntl.LOCK_EX)
+    """Hold an exclusive flock on the manifest itself for a read-then-append.
+
+    A host app may rewrite the manifest (to re-point a moved file's line) by writing a
+    temp file and renaming it over this one, holding the same flock on the file it
+    replaces. A `save` that was waiting then wakes holding a lock on the old,
+    unlinked file, which locks out nobody. So after taking the lock, check that the
+    name still leads to the locked file; if it doesn't, take the lock again on the
+    file that is there now.
+    """
+    path = os.path.join(inbox, MANIFEST_NAME)
+    while True:
+        fh = open(path, "a+", encoding="utf-8")
         try:
-            yield
-        finally:
             if fcntl:
-                fcntl.flock(fh, fcntl.LOCK_UN)
+                fcntl.flock(fh, fcntl.LOCK_EX)
+                held = os.fstat(fh.fileno())
+                try:
+                    now = os.stat(path)
+                except FileNotFoundError:
+                    now = None
+                if now is None or (now.st_dev, now.st_ino) != (held.st_dev, held.st_ino):
+                    fcntl.flock(fh, fcntl.LOCK_UN)
+                    continue                  # replaced while we waited: lock the new one
+            try:
+                yield
+            finally:
+                if fcntl:
+                    fcntl.flock(fh, fcntl.LOCK_UN)
+            return
+        finally:
+            fh.close()
 
 
 def _claim(inbox, stem, ext, data, taken):
