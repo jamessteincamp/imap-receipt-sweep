@@ -5,9 +5,10 @@
 
 For every fixture it checks: a keep got exactly one manifest line with the
 right kind, the expected amounts, a vendor containing the expected word, the
-right renews_on, and a saved file with the expected extension that exists; a
-skip got no line; the duplicate got no line beyond the original's. Exit 1 on
-any failure. Stdlib only.
+right renews_on, and a saved file with the expected extension that exists and
+is named by the skill's rule; a skip got no line; the duplicate got no line
+beyond the original's. Exit 1 on any failure. Stdlib only; reads the manifest
+through the skill's own scripts/manifest.py.
 """
 import argparse
 import email
@@ -17,6 +18,8 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "skill", "imap-receipt-sweep", "scripts"))
+import manifest  # noqa: E402
 
 
 def message_id_of(eml_path):
@@ -31,11 +34,7 @@ def main():
     a = ap.parse_args()
     fixtures_dir = os.path.dirname(os.path.abspath(a.expected))
 
-    manifest = os.path.join(a.inbox, ".sweep-manifest.jsonl")
-    lines = []
-    if os.path.exists(manifest):
-        with open(manifest, encoding="utf-8") as fh:
-            lines = [json.loads(l) for l in fh if l.strip()]
+    lines = manifest.read_lines(a.inbox)
     by_id = {}
     for r in lines:
         by_id.setdefault(r.get("message_id"), []).append(r)
@@ -76,8 +75,9 @@ def main():
         results.append((name, f"file saved with {e['saved_ext']}",
                         f.endswith(e["saved_ext"]) and os.path.exists(os.path.join(a.inbox, f)),
                         f"got {f!r}, exists={os.path.exists(os.path.join(a.inbox, f))}"))
-        results.append((name, "file name starts with YYYY-MM-DD_",
-                        len(f) > 11 and f[4] == "-" and f[7] == "-" and f[10] == "_", f"got {f!r}"))
+        stem = manifest.file_stem(str(r.get("date")), str(r.get("from")), str(r.get("subject")))
+        results.append((name, "file named by the rule (date_sender_subject)",
+                        f.startswith(stem), f"got {f!r}, want {stem}…"))
 
     failed = [r for r in results if not r[2]]
     for name, what, ok, detail in results:

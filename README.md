@@ -74,8 +74,8 @@ These hold for the kit today and are the contract the skill is written to.
 Why a skill and not code: the hard part of a sweep is judgement — *is this
 marketing or a receipt? is it a receipt **and** a renewal notice?* — which
 substring rules do badly and untestably. The easy parts (de-dupe, don't
-re-save, never upload) are a few lines the skill states and the manifest
-enforces.
+re-save, never overwrite) are code: `scripts/manifest.py` refuses a duplicate,
+an overwrite or a malformed line before it writes anything.
 
 How it has been tested: against the nine synthetic fixtures in
 [`eval/fixtures/`](eval/fixtures/) (all nine judged correctly, manifest valid
@@ -84,12 +84,14 @@ iCloud INBOX (ten days, ten saves, folder always named, cap honoured, no
 shipping notices, attachment saved as a PDF). The same model *without* the
 skill made the same keep/skip decisions but wrote a manifest a consumer
 couldn't use — amounts as objects, dates as timestamps, stray `.eml` copies —
-which is what the skill is for.
+which is what the skill is for. `python3 -m unittest discover tests` covers
+the manifest module, including the fixture path end to end with the model's
+judgement taken from the answer key.
 
 ## The manifest
 
 One JSON object per line in `<inbox>/.sweep-manifest.jsonl`, schema in
-[`manifest.schema.json`](manifest.schema.json):
+[`manifest.schema.json`](skill/imap-receipt-sweep/manifest.schema.json):
 
 ```json
 {"message_id": "<abc@example.com>", "account": "personal", "date": "2026-09-05",
@@ -108,11 +110,14 @@ this repo stops at the folder.
 README.md                  this file
 LICENSE                    MIT
 rules.example.csv          field,contains,mode — optional narrowing rules, generic entries only
-manifest.schema.json       the per-file record the skill writes
 skill/imap-receipt-sweep/
-  SKILL.md                 the skill: contract, search, classification guide, saving, manifest, fixture mode
+  SKILL.md                 the skill: contract, search, classification guide, saving, fixture mode
+  manifest.schema.json     the per-file record the skill writes; read by manifest.py at run time
+  scripts/manifest.py      the manifest: status for a run, save for a keep
+  scripts/manifest_check.py  thin wrapper over manifest.py, kept for older instructions
   scripts/eml_to_json.py   fixture mode — .eml files in the shape mail_fetch returns
-  scripts/manifest_check.py  validates a manifest; prints the last date / the ids
+tests/                     unittest suite for manifest.py
+docs/adr/                  decisions, numbered
 eval/
   README.md                the flagged-mail recall method
   recall_audit.py          stdlib; headers-only; writes a scorecard CSV

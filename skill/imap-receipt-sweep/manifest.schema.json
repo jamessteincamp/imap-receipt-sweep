@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/jamessteincamp/imap-receipt-sweep/blob/main/manifest.schema.json",
+  "$id": "https://github.com/jamessteincamp/imap-receipt-sweep/blob/main/skill/imap-receipt-sweep/manifest.schema.json",
   "title": "imap-receipt-sweep manifest line",
   "description": "One JSON object per line in <inbox>/.sweep-manifest.jsonl — one per file the sweep saved. Consumers key on message_id for de-dupe and on kind for routing.",
   "type": "object",
@@ -14,7 +14,7 @@
     },
     "account": {
       "type": "string",
-      "description": "Which configured mailbox it came from — the config file's stem, e.g. 'personal'."
+      "description": "Which configured mailbox it came from: the server config file's stem, e.g. 'personal' for personal.yaml. By the kit's convention the MCP server is named mail-<stem>, so a tool prefix such as mail-personal or icloud-personal is written as 'personal'."
     },
     "date": {
       "type": "string",

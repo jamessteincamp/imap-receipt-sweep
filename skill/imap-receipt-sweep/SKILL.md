@@ -42,12 +42,15 @@ user's second run should need no questions at all.
 | Input | How to settle it |
 |---|---|
 | **Inbox folder** | The user names it ("into `~/receipts/inbox`"). Create it if missing. The manifest is `<inbox>/.sweep-manifest.jsonl`. |
-| **Accounts** | The `mail_fetch` tools present in the session, one per mailbox (prefixed by server name — `mail-personal`, `icloud-work`, …). Use all of them unless the user names some. The account name in the manifest is that prefix minus any `mail-`/`icloud-` decoration, or whatever the user calls it. **Fixture mode:** if the user points at a folder of `.eml` files instead, each sub-folder is an account — see §6. |
-| **Window** | Default: from the latest `date` in the manifest **minus 2 days** (overlap is cheap; a gap is not). No manifest yet → last 30 days. The user can override ("since August"). `python3 scripts/manifest_check.py <inbox> --last` prints the latest date. |
+| **Accounts** | The `mail_fetch` tools present in the session, one per mailbox (prefixed by server name — `mail-personal`, `icloud-work`, …). Use all of them unless the user names some. Pass the prefix as `account`; `save` records it as the server config's stem (`mail-personal` → `personal`). **Fixture mode:** if the user points at a folder of `.eml` files instead, each sub-folder is an account — see §6. |
+| **Window** | From the latest `date` in the manifest **minus 2 days** (overlap is cheap; a gap is not); the last 30 days when there is no manifest yet. The user can override ("since August") — pass it to `status` as `--since`. `status` works the window out; don't compute it yourself. |
 | **Rules file** *(optional)* | A `field,contains,mode` CSV (see `rules.example.csv` in the repo). Include terms widen the search; exclude terms drop obvious marketing before you read it. Without one, use the generic vocabulary below. |
 
-Then run `python3 scripts/manifest_check.py <inbox>` once: it validates what is
-already there and you'll need its `--ids` output for de-dupe.
+Then run `python3 scripts/manifest.py status <inbox>` once. It prints the
+window to search (`window.start`), a run token (`run`) that every `save` this
+run must carry, the `source_id`s already swept for each account
+(`seen.source_ids`), and any problems with the manifest. Problems don't stop
+the run; mention them in the report.
 
 ## 2. List candidates (cheap: metadata only)
 
@@ -77,18 +80,19 @@ exclude term. Keep everything else as a candidate — **when in
 doubt, read it**; a wrong drop here is invisible, a wrong keep costs one
 fetch.
 
-**Pre-fetch de-dupe:** the manifest's `source_id` values are the server's own
-ids (`mail://<token>/<uid>`); a candidate whose `id` is already there was
-swept before — skip it without fetching.
+**Pre-fetch de-dupe:** a candidate whose `id` is in `status`'s
+`seen.source_ids` for that account was swept before — skip it without
+fetching.
 
 ## 3. Read and classify (per candidate)
 
 Fetch the candidate in full — `mail_fetch` with `ids: [<id>]`,
 `include: "full"`, `include_attachments: "meta"`. That one call gives you the
 body (`body_text` and/or `body_html`), the attachment list, and the
-`headers["Message-ID"]` you need for the real de-dupe check: **if that
-Message-ID is in the manifest — from any account — skip it.** The same receipt
-delivered to two addresses is one receipt.
+`headers["Message-ID"]`, which is the real de-dupe key. `save` refuses a
+Message-ID the manifest already has, from any account, and says so (exit 3):
+count it as a dupe and move on. The same receipt delivered to two addresses is
+one receipt.
 
 Now decide. The question is not "does it mention money?" (marketing does) but
 **"does this message record money moving, or announce a specific upcoming
@@ -116,58 +120,59 @@ message presents it (brand name, not the sending domain); `renews_on` as
 `YYYY-MM-DD` when a specific date is stated (resolve "1 October" against the
 message's year).
 
-## 4. Save the artifact
+## 4. Save the keep
 
 Pick **one** thing to save per kept message, in this order:
 
 1. A PDF or image attachment that is the receipt/invoice/statement
    (`attachments[].filename` ends `.pdf .png .jpg .jpeg .heic`). Get it with
-   `mail_download_attachment(message_id=<id>, attachment_id="<index>")`;
-   the result is Base64. Write it to `<file>.b64` with your file-writing tool,
-   then `base64 -d <file>.b64 > <file>` and delete the `.b64`. If an
+   `mail_download_attachment(message_id=<id>, attachment_id="<index>")`. If an
    attachment is over ~2 MB, fall back to the body and say so in `notes`.
-2. Otherwise `body_html` → `.html`.
-3. Otherwise `body_text` → `.txt` — unless it is actually HTML (some servers
-   put an HTML-only message under `body_text`; if it starts with `<` or is
-   full of tags, save it as `.html`).
+2. Otherwise `body_html`.
+3. Otherwise `body_text`.
 
-If a tool result is large and your environment spills it to a file instead of
-showing it, work from that file (decode or copy it) rather than retyping the
-content — retyping a PDF's Base64 by hand is how bytes get corrupted.
+Put it in a file and hand that file to `save`; never retype content. If your
+environment spilled the tool result to a file, pass that file as it is: `save`
+finds the Base64 or HTML inside a JSON tool result, decodes Base64, and picks
+the extension from the content — an HTML body filed under `body_text` is still
+saved as `.html`.
 
-File name: `YYYY-MM-DD_<sender-slug>_<subject-slug>.<ext>` — date from the
-message's `date`; sender slug from the domain's second-level label
-(`billing@contoso-cloud.example` → `contoso-cloud`); subject slug: lowercase the
-subject, replace every run of non-alphanumerics with `-`, trim the dashes,
-**then** keep the first 40 characters (trim a trailing dash again). If the name already exists,
-append `-2`, `-3`. Never overwrite.
-
-Then append **one line** to `<inbox>/.sweep-manifest.jsonl`. The contract is
-enforced by `scripts/manifest_check.py` (bundled with this skill; the formal
-JSON Schema, `manifest.schema.json`, lives in the project repo and is not
-needed at run time):
-
-```json
-{"message_id": "<nw-2231-receipt@northwind.example>", "account": "personal",
+```
+python3 scripts/manifest.py save <inbox> --run <run> --content <file> <<'EOF'
+{"message_id": "<nw-2231-receipt@northwind.example>", "account": "mail-personal",
  "date": "2026-09-05", "from": "receipts@northwind.example",
  "subject": "Your Northwind Stationery receipt — order #NW-2231", "kind": "receipt",
- "file": "2026-09-05_northwind_your-northwind-stationery-receipt-order.html",
  "amounts": ["42.17"], "vendor": "Northwind Stationery", "renews_on": null,
- "swept_at": "2026-09-11T10:42:00", "source_id": "mail://SU5CT1g/1042"}
+ "source_id": "mail://SU5CT1g/1042"}
+EOF
 ```
+
+The meta is the message's facts as `mail_fetch` gave them, plus your
+judgement. `save` does the rest: it names the file
+`YYYY-MM-DD_<sender>_<subject>.<ext>`, never overwrites, normalises dates,
+addresses and amounts, and writes the file before its manifest line. It prints
+one JSON object:
+
+| Exit | Meaning | What you do |
+|---|---|---|
+| 0 | saved — `file`, `line` and `cap_remaining` echoed | carry on |
+| 2 | invalid — `field` and `message` say what | fix the meta and save again |
+| 3 | duplicate Message-ID — `existing` names the first copy | count a dupe, move on |
+| 4 | cap reached for this account | stop this account (§5) |
+| 5 | I/O error | stop and report it |
+
+On 2–5 nothing was written.
 
 Use `notes` for anything a human should know about that file — an attachment
 skipped for size, a bank bill-pay relay that duplicates a vendor's own bill
-under a different Message-ID, an amount you were unsure of.
-
-`from` is the bare address. `kind` is never `skip` — skipped mail gets no line.
-Write the file before the line, so a crash never leaves a line without its
-file.
+under a different Message-ID, an amount you were unsure of. `kind` is never
+`skip`: skipped mail is never saved.
 
 ## 5. Stop conditions and the report
 
-- **Cap:** after the 50th save for an account, stop that account and say so;
-  the user re-runs to continue (the window logic picks up where you left off).
+- **Cap:** `save` refuses the 51st save for an account in this run (exit 4).
+  Stop that account and say so; the user re-runs to continue (the window picks
+  up where you left off).
 - **Auth or connection error** from a server: stop that account, report the
   error verbatim, do **not** retry — a retry loop against a mailbox is exactly
   what a read-only promise must never turn into.
@@ -184,8 +189,10 @@ work            57    12      4      1       7    receipt 4
 window 2026-08-27 → 2026-09-11 · inbox ~/receipts/inbox · cap not reached
 ```
 
-then the file list, then anything a human should look at (`notes`). Run
-`scripts/manifest_check.py <inbox>` last and include its line.
+`python3 scripts/manifest.py status <inbox> --run <run>` gives this run's
+saved count, kinds, files and notes for each account, and whether the manifest
+is valid; the listed, read and skipped counts are your own. Then the file list,
+then anything a human should look at (`notes`).
 
 ## 6. Fixture mode (no mailbox)
 
