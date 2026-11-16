@@ -1,0 +1,13 @@
+# Gives a newly opened issue an assignee and a built-in Type if it has none.
+# The logic lives in jamessteincamp/.github — see its README.
+name: Issue defaults
+on:
+  issues:
+    types: [opened]
+permissions:
+  issues: write
+jobs:
+  defaults:
+    uses: jamessteincamp/.github/.github/workflows/issue-defaults.yml@main
+    with:
+      default-assignee: jamessteincamp
